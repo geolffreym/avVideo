@@ -25,6 +25,7 @@ set(
 
 include_directories(/usr/include/)
 #include_directories(~/ffmpeg_source)
+#link_directories(/usr/bin/)
 link_directories(~/ffmpeg_source)
 #link_directories(/usr/local/lib/)
 
@@ -35,10 +36,8 @@ check_include_files(libavcodec/avcodec.h HAVE_AVCODEC_H)
 file(GLOB SOURCE RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cxx)
 
 #Here we add our source files
-set(SOURCE_FILES
-    main.cpp)
 
-add_executable(avVideo ${SOURCE_FILES})
+add_executable(avVideo main.cpp avEncoder.cpp avEncoder.h avDecoder.cpp avDecoder.h)
 TARGET_LINK_LIBRARIES(avVideo ${FFMPEG_LIBS})
 
 

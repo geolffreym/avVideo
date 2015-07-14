@@ -76,19 +76,25 @@ public:
     };
 
     avVideo () {
+        cout << "** Starting Process **" << endl;
         avcodec_register_all ();
         av_register_all ();
+    }
+
+    ~avVideo () {
+        cout << "** Proccess end **";
     }
 
     /** Set the video file directory
      * @param filename The full file directory
      * @return void
      * **/
-    bool setVideoFile (const char filename) {
+    bool setVideoFile (string filename) {
         this->source_file = filename;
-        this->file = fopen (filename, 'wb');
+        this->file = fopen (filename.c_str (), "wb");
+
         if ( !this->file ) {
-            cerr << "Could not open file: " << filename;
+            cerr << ":: Could not open file: ";
             return false;
         }
 
@@ -103,29 +109,56 @@ public:
         this->codec = avcodec_find_encoder (( AVCodecID ) codec_id);
 
         if ( !this->codec ) {
-            cerr << ("Codec not found \n");
+            cerr << (":: Codec not found \n");
             return false;
         }
 
-        cout << "Setting Context for codec " << this->codec << endl;
+        cout << "-> Setting context for codec " << this->codec << endl;
         this->codec_context = avcodec_alloc_context3 (this->codec);
 
         if ( !this->codec_context ) {
-            cerr << "Could not allocate codec context \n" << endl;
+            cerr << ":: Could not allocate codec context \n" << endl;
             return false;
         }
 
         //Initial private config
         this->codec_context->max_b_frames = 1;
-        this->setPixelFormat (this->PXF_RGBA);
-        this->setGroupFrameSize (10); // Constant Group Frames Size
+        this->setWidth (0x258);
+        this->setHeight (0x190);
+        this->setPixelFormat (this->PXF_YUV420);
+        this->setGroupFrameSize (0xA); // Constant Group Frames Size
 
         return true;
     }
 
-    bool initCodec () {
-        cout << "Opening codec " << this->codec << endl;
-        return (this->codec_open = (avcodec_open2 (this->codec_context, this->codec, NULL) > 0));
+    /**
+     * Initialize AvContext to use codec
+     * @param bit_rate The bit rate
+     * @return void
+     */
+    virtual bool openCodec () {
+        cout << "-> Opening codec " << this->codec << endl;
+
+        this->codec_open = (avcodec_open2 (this->codec_context, this->codec, NULL) > 0);
+
+        cout << this->codec_open;
+
+        if ( !this->codec_open ) {
+            cerr << ":: Could not open codec: " << this->codec << endl;
+            return false;
+        }
+
+        this->frame = avcodec_alloc_frame ();
+
+        if ( !this->frame ) {
+            cerr << ":: Could not allocate video frame" << endl;
+            return false;
+        }
+
+        this->frame->format = this->codec_context->pix_fmt;
+        this->frame->width = this->codec_context->width;
+        this->frame->height = this->codec_context->height;
+        return true;
     }
 
     /**
@@ -146,6 +179,11 @@ public:
         }
     }
 
+    /**
+    * Set video width
+    * @param w The width
+    * @return void
+    */
     void setWidth (int w) {
         try {
             if ( !this->codec_context ) {
@@ -159,6 +197,11 @@ public:
         }
     }
 
+    /**
+    * Set video width
+    * @param w The width
+    * @return void
+    */
     void setHeight (int h) {
         try {
             if ( !this->codec_context ) {
