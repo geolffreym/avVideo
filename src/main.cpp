@@ -39,7 +39,7 @@ int main () {
         //Open the codec
         if ( video.openCodec ()) {
             if ( video.allocate ()) {
-                video.encode ("happy:");
+                video.encode (filename);
             }
         }
     }
