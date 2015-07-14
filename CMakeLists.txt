@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 2.8.4)
+project(avVideo)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__STDC_CONSTANT_MACROS")
+set(CMAKE_CXX_FLAGS  ${CMAKE_CXX_FLAGS}\ -Wall\ -std=c++11 )
+add_subdirectory(src)
