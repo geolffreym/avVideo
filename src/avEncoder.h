@@ -8,7 +8,12 @@
 #include "avVideo.h"
 
 class avEncoder : public avVideo {
+public:
+    bool allocated = false;
 
+    bool allocate ();
+
+    bool encode (string file);
 };
 
 

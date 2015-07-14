@@ -25,6 +25,7 @@
 #include <stddef.h>
 #include <map>
 #include <exception>
+#include "avConsole.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -44,7 +45,7 @@ using namespace std;
 
 class avVideo {
 
-private:
+protected:
 
     AVCodec *codec = nullptr;
     AVCodecContext *codec_context = nullptr;
@@ -54,36 +55,6 @@ private:
     string source_file;
 
     bool codec_open = false;
-
-
-public:
-
-    enum Codecs {
-        CODEC_MPEG2VIDEO = AV_CODEC_ID_MPEG2VIDEO,
-        CODEC_MPEG4 = AV_CODEC_ID_MPEG4,
-        CODEC_FLV = AV_CODEC_ID_FLV1,
-        CODEC_H264 = AV_CODEC_ID_H264,
-        CODEC_THEORA = AV_CODEC_ID_THEORA
-    };
-
-    enum PXFormat {
-        PXF_RGBA = AV_PIX_FMT_RGBA,
-        PXF_RGB24 = AV_PIX_FMT_RGB24,
-        PXF_YUV420 = AV_PIX_FMT_YUV420P,
-        PXF_YUV422 = AV_PIX_FMT_YUV422P,
-        PXF_MONOBLACK = AV_PIX_FMT_MONOBLACK,
-        PXF_MONOWHITE = AV_PIX_FMT_MONOWHITE,
-    };
-
-    avVideo () {
-        cout << "** Starting Process **" << endl;
-        avcodec_register_all ();
-        av_register_all ();
-    }
-
-    ~avVideo () {
-        cout << "** Proccess end **";
-    }
 
     /** Set the video file directory
      * @param filename The full file directory
@@ -101,22 +72,51 @@ public:
         return true;
     }
 
+public:
+
+    //The codecs
+    enum Codecs {
+        CODEC_MPEG2VIDEO = AV_CODEC_ID_MPEG2VIDEO,
+        CODEC_MPEG4 = AV_CODEC_ID_MPEG4,
+        CODEC_FLV = AV_CODEC_ID_FLV1,
+        CODEC_H264 = AV_CODEC_ID_H264,
+        CODEC_THEORA = AV_CODEC_ID_THEORA
+    };
+
+    //The pixels format
+    //http://www.qnx.com/developers/docs/660/index.jsp?topic=%2Fcom.qnx.doc.screen%2Ftopic%2Fmanual%2Frscreen_window_pixel.html
+    enum PXFormat {
+        PXF_RGBA = AV_PIX_FMT_RGBA,
+        PXF_RGB24 = AV_PIX_FMT_RGB24,
+        PXF_YUV420 = AV_PIX_FMT_YUV420P,
+        PXF_YUV422 = AV_PIX_FMT_YUV422P,
+        PXF_MONOBLACK = AV_PIX_FMT_MONOBLACK,
+        PXF_MONOWHITE = AV_PIX_FMT_MONOWHITE,
+    };
+
+    avVideo () {
+        cout << "** Starting Process **" << endl << endl;
+        avcodec_register_all ();
+        av_register_all ();
+    }
+
+    ~avVideo () {
+        cout << "** Proccess end **";
+    }
+
     /** Set the new video codec
      * @param codec_id The codec number
      * @return bool
      * **/
     bool setCodec (int codec_id) {
-        this->codec = avcodec_find_encoder (( AVCodecID ) codec_id);
 
-        if ( !this->codec ) {
-            cerr << (":: Codec not found \n");
+        if ( !(this->codec = avcodec_find_encoder (( AVCodecID ) codec_id))) {
+            cerr << ":: Codec not found" << endl;
             return false;
         }
 
-        cout << "-> Setting context for codec " << this->codec << endl;
-        this->codec_context = avcodec_alloc_context3 (this->codec);
-
-        if ( !this->codec_context ) {
+        cout << "-? Setting context for codec " << this->codec << endl;
+        if ( !(this->codec_context = avcodec_alloc_context3 (this->codec))) {
             cerr << ":: Could not allocate codec context \n" << endl;
             return false;
         }
@@ -127,30 +127,29 @@ public:
         this->setHeight (0x190);
         this->setPixelFormat (this->PXF_YUV420);
         this->setGroupFrameSize (0xA); // Constant Group Frames Size
-
+        cout << "-> Context ready " << this->codec << endl << endl;
         return true;
     }
 
     /**
-     * Initialize AvContext to use codec
+     * Initialize AvContext to use Codec
      * @param bit_rate The bit rate
      * @return void
      */
     virtual bool openCodec () {
-        cout << "-> Opening codec " << this->codec << endl;
 
-        this->codec_open = (avcodec_open2 (this->codec_context, this->codec, NULL) > 0);
+        if ( !this->codec_context ) {
+            cerr << ":: No codec context is set" << endl;
+            return false;
+        }
 
-        cout << this->codec_open;
-
-        if ( !this->codec_open ) {
+        cout << "-? Opening codec " << this->codec << endl;
+        if ( !(this->codec_open = (avcodec_open2 (this->codec_context, this->codec, NULL) >= 0))) {
             cerr << ":: Could not open codec: " << this->codec << endl;
             return false;
         }
 
-        this->frame = avcodec_alloc_frame ();
-
-        if ( !this->frame ) {
+        if ( !(this->frame = avcodec_alloc_frame ())) {
             cerr << ":: Could not allocate video frame" << endl;
             return false;
         }
@@ -158,6 +157,8 @@ public:
         this->frame->format = this->codec_context->pix_fmt;
         this->frame->width = this->codec_context->width;
         this->frame->height = this->codec_context->height;
+
+        cout << "-> Codec Open " << this->codec << endl << endl;
         return true;
     }
 
@@ -175,7 +176,8 @@ public:
             this->codec_context->bit_rate = bit_rate;
 
         } catch ( const char *msg ) {
-            cerr << msg << endl;
+            cerr << ":: " << msg << endl;
+            exit (1);
         }
     }
 
@@ -193,7 +195,8 @@ public:
             this->codec_context->width = w;
 
         } catch ( const char *msg ) {
-            cerr << msg << endl;
+            cerr << ":: " << msg << endl;
+            exit (1);
         }
     }
 
@@ -211,7 +214,8 @@ public:
             this->codec_context->height = h;
 
         } catch ( const char *msg ) {
-            cerr << msg << endl;
+            cerr << ":: " << msg << endl;
+            exit (1);
         }
     }
 
@@ -230,7 +234,8 @@ public:
             this->codec_context->time_base = ( AVRational ) {frames, seconds};
 
         } catch ( const char *msg ) {
-            cerr << msg << endl;
+            cerr << ":: " << msg << endl;
+            exit (1);
         }
     }
 
@@ -248,7 +253,8 @@ public:
             this->codec_context->gop_size = gop_size;
 
         } catch ( const char *msg ) {
-            cerr << msg << endl;
+            cerr << ":: " << msg << endl;
+            exit (1);
         }
     }
 
@@ -267,7 +273,8 @@ public:
             this->codec_context->pix_fmt = ( AVPixelFormat ) fmt;
 
         } catch ( const char *msg ) {
-            cerr << msg << endl;
+            cerr << ":: " << msg << endl;
+            exit (1);
         }
 
     }

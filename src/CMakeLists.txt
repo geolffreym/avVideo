@@ -37,7 +37,7 @@ file(GLOB SOURCE RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cxx)
 
 #Here we add our source files
 
-add_executable(avVideo main.cpp avEncoder.cpp avEncoder.h avDecoder.cpp avDecoder.h)
+add_executable(avVideo main.cpp avEncoder.cpp avEncoder.h avDecoder.cpp avDecoder.h avConsole.h)
 TARGET_LINK_LIBRARIES(avVideo ${FFMPEG_LIBS})
 
 
