@@ -127,6 +127,7 @@ public:
         this->setHeight (0x190);
         this->setPixelFormat (this->PXF_YUV420);
         this->setGroupFrameSize (0xA); // Constant Group Frames Size
+
         cout << "-> Context ready " << this->codec << endl << endl;
         return true;
     }
