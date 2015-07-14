@@ -9,6 +9,7 @@
 
 class avEncoder : public avVideo {
 public:
+    //Is allocated? Flag
     bool allocated = false;
 
     bool allocate ();

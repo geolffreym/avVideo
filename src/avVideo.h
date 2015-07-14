@@ -1,9 +1,8 @@
 /**
-    Video
-    video.h
-    Purpose: Base class video ffmpeg encoder for PHP extension
-
-    For you My Brother Ruperma
+*   Created by gmena on 7/14/15.
+*   Video
+*   Purpose: Base class video ffmpeg encoder for PHP extension
+*   For you My Brother Ruperma
 ** */
 
 
