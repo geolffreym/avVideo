@@ -26,6 +26,23 @@ int main () {
     //int *const p2 = my; // Pointer immutable and value mutable
     //const int *const p3 = my; // Pointer immutable and value immutable
 
+//    int *x, y[5], *ptx; // Pointers
+//
+//    x = ( int * ) malloc (10); //Alloc ten block in memory for integer
+//    ptx = x; // Pointer ptx point to x
+//
+//    ptx[ 0 ] = 5; // ptx[0] == x[0]
+//    ptx[ 1 ] = 2; // ptx[1] == x[1]
+//    x[ 2 ] = 3; // x[2] == ptx[2]
+//
+//    ptx = y; // Change pointer to array
+//    ptx[ 2 ] = 3; // ptx[2] == y[2]
+//
+//
+//    cout << x[ 0 ] << endl;
+//    cout << x[ 1 ] << endl;
+//    cout << *(ptx + 2); // Is like y[2] | (ptx+2) is the direction for position 2 in memory block for Y
+
     string filename = "test.mpg";
 
     avEncoder video = avEncoder ();
