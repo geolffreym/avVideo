@@ -20,11 +20,6 @@
 #define    VIDEO_H
 
 #include <iostream>
-#include <cstddef>
-#include <stddef.h>
-#include <map>
-#include <exception>
-#include "avConsole.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -49,11 +44,11 @@ protected:
     AVCodec *codec = nullptr;
     AVCodecContext *codec_context = nullptr;
     AVFrame *frame = nullptr;
-    AVPacket *packet = nullptr;
     FILE *file = nullptr;
     string source_file;
-
     bool codec_open = false;
+
+    AVPacket packet ;
 
     /** Set the video file directory
      * @param filename The full file directory
